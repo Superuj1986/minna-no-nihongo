@@ -13,6 +13,13 @@ function App() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const selected = PAGES.find((item) => item.key === active);
 
+  const navigateTo = (pageKey) => {
+    setActive(pageKey);
+    if (window.innerWidth <= 960) {
+      setSidebarOpen(false);
+    }
+  };
+
   useEffect(() => {
     const update = () => setSidebarOpen(window.innerWidth > 960);
     update();
@@ -41,7 +48,7 @@ function App() {
           {PAGES.map((page) => (
             <button
               key={page.key}
-              onClick={() => setActive(page.key)}
+              onClick={() => navigateTo(page.key)}
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -118,16 +125,38 @@ function App() {
                   </p>
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 16 }}>
-                  <div style={{ padding: 20, borderRadius: 24, background: "#111827", border: "1px solid #1f2937" }}>
-                    <div style={{ fontSize: 28, marginBottom: 10 }}>📘</div>
-                    <h3 style={{ margin: "0 0 10px" }}>Kanji</h3>
-                    <p style={{ color: "#cbd5e1", lineHeight: 1.7 }}>Học Kanji theo bài. Thực hành qua câu hỏi và ôn tập.</p>
-                  </div>
-                  <div style={{ padding: 20, borderRadius: 24, background: "#111827", border: "1px solid #1f2937" }}>
-                    <div style={{ fontSize: 28, marginBottom: 10 }}>📝</div>
-                    <h3 style={{ margin: "0 0 10px" }}>Từ vựng</h3>
-                    <p style={{ color: "#cbd5e1", lineHeight: 1.7 }}>Xem danh sách từ vựng và bắt đầu ôn tập theo từng bài.</p>
-                  </div>
+                  <button
+                  type="button"
+                  onClick={() => navigateTo("kanji")}
+                  style={{
+                    padding: 20,
+                    borderRadius: 24,
+                    background: "#111827",
+                    border: "1px solid #1f2937",
+                    cursor: "pointer",
+                    textAlign: "left",
+                  }}
+                >
+                  <div style={{ fontSize: 28, marginBottom: 10 }}>📘</div>
+                  <h3 style={{ margin: "0 0 10px" }}>Kanji</h3>
+                  <p style={{ color: "#cbd5e1", lineHeight: 1.7 }}>Học Kanji theo bài. Thực hành qua câu hỏi và ôn tập.</p>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => navigateTo("vocab")}
+                  style={{
+                    padding: 20,
+                    borderRadius: 24,
+                    background: "#111827",
+                    border: "1px solid #1f2937",
+                    cursor: "pointer",
+                    textAlign: "left",
+                  }}
+                >
+                  <div style={{ fontSize: 28, marginBottom: 10 }}>📝</div>
+                  <h3 style={{ margin: "0 0 10px" }}>Từ vựng</h3>
+                  <p style={{ color: "#cbd5e1", lineHeight: 1.7 }}>Xem danh sách từ vựng và bắt đầu ôn tập theo từng bài.</p>
+                </button>
                 </div>
               </div>
             ) : active === "kanji" ? (
