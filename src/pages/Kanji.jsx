@@ -276,12 +276,21 @@ export default function Kanji(){
         .vr{display:flex;gap:10px;align-items:baseline;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.08)}
         .tag{cursor:pointer;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:700;border:2px solid transparent;transition:all .15s}
         .tag:hover{filter:brightness(1.2)}
+        .kanji-content{max-width:700px;margin:0 auto;padding:28px 16px}
+        .kanji-lesson-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}
+        .kanji-study-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:10px}
+        .kanji-card-row{display:flex;gap:18px;align-items:flex-start;margin-bottom:14px;flex-wrap:wrap}
+        .kanji-card-row>div:first-child{min-width:80px}
+        .kanji-exam-container,.kanji-result-container{max-width:100%;margin:0 auto;padding:26px 16px}
+        .kanji-buttons{display:flex;gap:10px;flex-wrap:wrap}
+        .kanji-buttons .btn{flex:1;min-width:140px}
+        @media (max-width:720px){.kanji-content{padding:20px 14px}.kanji-study-header{flex-direction:column;align-items:flex-start}.kanji-card-row{flex-direction:column}.kanji-card-row>div:first-child{width:100%}.kanji-buttons{flex-direction:column}.kanji-buttons .btn{width:100%}.kanji-lesson-grid{grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}}
         ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:rgba(255,255,255,.2);border-radius:3px}
       `}</style>
 
       {/* HOME */}
       {screen==="home"&&(
-        <div style={{maxWidth:700,margin:"0 auto",padding:"28px 16px"}}>
+        <div className="kanji-content">
           <div style={{textAlign:"center",marginBottom:28}}>
             <div style={{fontSize:52,marginBottom:6}}>漢字</div>
             <h1 style={{fontSize:22,letterSpacing:2,color:"#f1c40f",marginBottom:4}}>KANJI N5 — BÀI KIỂM TRA</h1>
@@ -291,14 +300,14 @@ export default function Kanji(){
           {/* ôn bài */}
           <div style={{background:"rgba(255,255,255,.07)",borderRadius:18,padding:20,marginBottom:16,border:"1px solid rgba(255,255,255,.13)"}}>
             <div style={{fontSize:12,color:"#f1c40f",letterSpacing:1,marginBottom:12,fontWeight:700}}>📖 ÔN BÀI</div>
-            <div style={{display:"flex",flexWrap:"wrap",gap:8,marginBottom:10}}>
+            <div style={{display:"flex",flexWrap:"wrap",gap:8,marginBottom:10}} className="kanji-tag-row">
               {groups.map((g,gi)=>(
                 <button key={gi} className="tag" style={{background:filter===gi?g.color:"rgba(255,255,255,.1)",borderColor:filter===gi?g.color:"transparent"}} onClick={()=>setFilter(filter===gi?null:gi)}>
                   {g.label}
                 </button>
               ))}
             </div>
-            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(120px,1fr))",gap:8}}>
+            <div className="kanji-lesson-grid">
               {visLessons.map(l=>(
                 <button key={l.id} className="lc btn" style={{borderLeft:`4px solid ${l.color}`,textAlign:"left"}} onClick={()=>{setStudyL(l);setScreen("study");}}>
                   <div style={{fontSize:10,color:"rgba(255,255,255,.4)",marginBottom:3}}>第{l.id}課</div>
@@ -333,14 +342,14 @@ export default function Kanji(){
       {/* STUDY */}
       {screen==="study"&&studyL&&(
         <div style={{maxWidth:660,margin:"0 auto",padding:"24px 16px"}}>
-          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:18}}>
+          <div className="kanji-study-header">
             <button className="btn" style={{background:"rgba(255,255,255,.1)",color:"#fff",padding:"7px 14px",fontSize:13}} onClick={()=>setScreen("home")}>← Trang chủ</button>
             <span style={{fontWeight:700,color:"#f1c40f",fontSize:15}}>{studyL.name}</span>
             <button className="btn" style={{background:studyL.color,color:"#fff",padding:"7px 14px",fontSize:13}} onClick={()=>startExam(studyL.id)}>Thi ngay →</button>
           </div>
           {studyL.kanji.map(k=>(
             <div key={k.char} className="fd" style={{background:"rgba(255,255,255,.07)",border:"1px solid rgba(255,255,255,.13)",borderRadius:18,padding:20,marginBottom:14}}>
-              <div style={{display:"flex",gap:18,alignItems:"flex-start",marginBottom:14}}>
+              <div className="kanji-card-row">
                 <div style={{fontSize:68,fontWeight:900,lineHeight:1,color:studyL.color,textShadow:`0 4px 24px ${studyL.color}55`,minWidth:80}}>{k.char}</div>
                 <div style={{flex:1}}>
                   <div style={{fontSize:11,color:"rgba(255,255,255,.4)",marginBottom:2}}>{k.viet}</div>
@@ -400,7 +409,7 @@ export default function Kanji(){
 
       {/* RESULT */}
       {screen==="result"&&(
-        <div style={{maxWidth:620,margin:"0 auto",padding:"32px 16px"}} className="fd">
+        <div className="kanji-result-container fd">
           <div style={{textAlign:"center",marginBottom:24}}>
             <div style={{fontSize:58,marginBottom:4}}>{pct>=90?"🏆":pct>=70?"✅":"📖"}</div>
             <div style={{fontSize:38,fontWeight:900,color:gc}}>{grade}</div>

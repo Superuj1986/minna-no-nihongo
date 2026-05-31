@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Kanji from "./pages/Kanji.jsx";
 import Vocab from "./pages/Vocab.jsx";
 
@@ -10,17 +10,22 @@ const PAGES = [
 
 function App() {
   const [active, setActive] = useState("home");
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const selected = PAGES.find((item) => item.key === active);
 
+  useEffect(() => {
+    const update = () => setSidebarOpen(window.innerWidth > 960);
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
   return (
-    <div style={{ minHeight: "100vh", display: "flex", background: "#0e1523", color: "#f8fafc" }}>
+    <div className="app-shell" style={{ minHeight: "100vh", background: "#0e1523", color: "#f8fafc" }}>
       <aside
+        className={`app-sidebar ${sidebarOpen ? "open" : "closed"}`}
         style={{
-          width: 280,
-          minWidth: 280,
           background: "#111827",
-          borderRight: "1px solid #1f2937",
-          padding: 24,
           boxSizing: "border-box",
           display: "flex",
           flexDirection: "column",
@@ -67,13 +72,21 @@ function App() {
         </div>
       </aside>
 
-      <main style={{ flex: 1, padding: 28, boxSizing: "border-box" }}>
+      <div className={sidebarOpen ? "sidebar-backdrop visible" : "sidebar-backdrop"} onClick={() => setSidebarOpen(false)} />
+      <main className="app-main" style={{ flex: 1, padding: 28, boxSizing: "border-box" }}>
         <div style={{ maxWidth: 1180, margin: "0 auto" }}>
+          <div className="app-topbar">
+            <button className="sidebar-toggle" onClick={() => setSidebarOpen((open) => !open)}>
+              {sidebarOpen ? "✕ Đóng menu" : "☰ Mở menu"}
+            </button>
+            <div>
+              <p style={{ color: "#60a5fa", fontWeight: 700, marginBottom: 8 }}>Trang điều hướng</p>
+              <h1 style={{ fontSize: 26, margin: 0 }}>{selected?.label || "Trang chủ"}</h1>
+            </div>
+          </div>
           <header style={{ marginBottom: 24 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
+            <div className="app-header">
               <div>
-                <p style={{ color: "#60a5fa", fontWeight: 700, marginBottom: 8 }}>Trang điều hướng</p>
-                <h1 style={{ fontSize: 34, margin: 0 }}>{selected?.label || "Trang chủ"}</h1>
                 <p style={{ color: "#cbd5e1", marginTop: 10, maxWidth: 600 }}>
                   {active === "home"
                     ? "Chào mừng đến với Minna no Nihongo. Chọn một trang bên trái để bắt đầu học Kanji hoặc từ vựng."
@@ -97,7 +110,7 @@ function App() {
 
           <section style={{ minHeight: "70vh" }}>
             {active === "home" ? (
-              <div style={{ display: "grid", gap: 18 }}>
+              <div className="app-home-panel">
                 <div style={{ padding: 24, borderRadius: 24, background: "#111827", border: "1px solid #1f2937" }}>
                   <h2 style={{ fontSize: 22, marginBottom: 10 }}>Chào mừng</h2>
                   <p style={{ color: "#cbd5e1", lineHeight: 1.8 }}>

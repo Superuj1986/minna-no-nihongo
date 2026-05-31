@@ -593,9 +593,11 @@ const VOCAB = [
 
 const LESSON_ACCENT = {
   1:"#D85A30", 2:"#1D9E75", 3:"#378ADD", 4:"#BA7517",
-  5:"#D4537E", 6:"#534AB7", 7:"#0F6E56", 8:"#A32D2D", 
+  5:"#D4537E", 6:"#534AB7", 7:"#0F6E56", 8:"#A32D2D",
   9:"#3B6D11", 10:"#6B4E9E", 11:"#E07A5F", 12:"#3D9E7E",
-  13:"#2A6D9E", 14:"#9E4E3D"
+  13:"#2A6D9E", 14:"#9E4E3D", 15:"#CA6F1E", 16:"#2874A6",
+  17:"#7D3C98", 18:"#17A589", 19:"#5D6D7E", 20:"#AF7AC5",
+  21:"#229954", 22:"#F39C12", 23:"#2E86C1", 24:"#C0392B", 25:"#117A65"
 };
 
 function shuffle(arr) {
@@ -619,13 +621,17 @@ const styles = {
   subtitle: { fontSize: 14, color: "var(--color-text-secondary)", margin: 0 },
   section: { marginBottom: 20 },
   label: { fontSize: 13, fontWeight: 600, color: "#666", marginBottom: 8, display: "block" },
-  lessonGrid: { display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 8 },
-  lessonBtn: (active, n) => ({
-    padding: "10px 4px", border: `2px solid ${active ? LESSON_ACCENT[n] : "#ddd"}`,
-    borderRadius: 8, background: active ? LESSON_ACCENT[n] : "transparent",
-    color: active ? "#fff" : "#555", fontSize: 14, fontWeight: 500, cursor: "pointer"
-  }),
-  modeRow: { display:"flex", gap:8, marginBottom:16 },
+  lessonGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(48px, 1fr))", gap: 8 },
+  lessonBtn: (active, n) => {
+    const accent = LESSON_ACCENT[n] ?? "#6b7280";
+    return {
+      padding: "10px 4px", border: `2px solid ${active ? accent : "#ddd"}`,
+      borderRadius: 8, background: active ? accent : "transparent",
+      color: active ? "#fff" : "#555", fontSize: 14, fontWeight: 500, cursor: "pointer",
+      minWidth: 0,
+    };
+  },
+  modeRow: { display:"flex", gap:8, marginBottom:16, flexWrap:"wrap" },
   modeBtn: (active) => ({
     flex:1, padding:"9px 0", border:`0.5px solid ${active ? "var(--color-border-primary)" : "var(--color-border-tertiary)"}`,
     borderRadius:8, background: active ? "var(--color-background-secondary)" : "transparent",
@@ -635,13 +641,14 @@ const styles = {
   startBtn: (color) => ({
     flex:1, padding:"12px 0", borderRadius:10, border:"none",
     background: color, color:"#fff", fontSize:15, fontWeight:500,
-    cursor:"pointer", transition:"opacity 0.15s"
+    cursor:"pointer", transition:"opacity 0.15s", minWidth: 120,
   }),
   countBadge: { fontSize:12, color:"var(--color-text-secondary)", marginLeft:8 },
 
   card: {
     background:"var(--color-background-primary)", border:"0.5px solid var(--color-border-tertiary)",
     borderRadius:16, padding:"40px 32px", textAlign:"center",
+    minHeight: 160,
     cursor:"pointer", userSelect:"none", transition:"transform 0.15s, box-shadow 0.15s",
     minHeight:180, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center",
     gap:12
@@ -655,11 +662,11 @@ const styles = {
     color: LESSON_ACCENT[n], marginBottom:8
   }),
 
-  progress: { display:"flex", alignItems:"center", gap:10, marginBottom:16 },
+  progress: { display:"flex", alignItems:"center", gap:10, marginBottom:16, flexWrap:"wrap" },
   progressBar: { flex:1, height:4, background:"var(--color-border-tertiary)", borderRadius:2, overflow:"hidden" },
   progressFill: (pct, color) => ({ height:"100%", width:`${pct}%`, background: color, borderRadius:2, transition:"width 0.3s" }),
 
-  navRow: { display:"flex", gap:8, marginTop:12 },
+  navRow: { display:"flex", gap:8, marginTop:12, flexWrap:"wrap" },
   navBtn: { flex:1, padding:"10px", border:"0.5px solid var(--color-border-tertiary)", borderRadius:8,
     background:"transparent", color:"var(--color-text-primary)", fontSize:14, cursor:"pointer" },
   prevNext: { display:"flex", gap:8, marginTop:16 },
@@ -680,8 +687,10 @@ const styles = {
 
 export default function App() {
   const [screen, setScreen] = useState("home");
-  const [selLessons, setSelLessons] = useState(new Set([1,2,3,4,5,6,7,8,9,10,11,12,13,14]));
+  const [selLessons, setSelLessons] = useState(new Set([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25]));
   const [direction, setDirection] = useState("jp");
+  const allLessons = Array.from({ length: 25 }, (_, index) => index + 1);
+  const hasSelection = selLessons.size > 0;
 
   const [deck, setDeck] = useState([]);
   const [cardIdx, setCardIdx] = useState(0);
@@ -700,13 +709,19 @@ export default function App() {
     setSelLessons(prev => {
       const s = new Set(prev);
       if (s.has(n)) {
-        if (s.size > 1) s.delete(n);
-      } else s.add(n);
+        s.delete(n);
+      } else {
+        s.add(n);
+      }
       return s;
     });
   };
 
+  const selectAllLessons = () => setSelLessons(new Set(allLessons));
+  const clearAllLessons = () => setSelLessons(new Set());
+
   const startStudy = () => {
+    if (!hasSelection) return;
     const d = shuffle(filtered);
     setDeck(d);
     setCardIdx(0);
@@ -715,6 +730,7 @@ export default function App() {
   };
 
   const startQuiz = () => {
+    if (!hasSelection) return;
     const d = shuffle(filtered);
     setQuizDeck(d);
     setQuizIdx(0);
@@ -756,14 +772,25 @@ export default function App() {
         <div style={styles.header}>
           <div>
             <p style={styles.title}>Minna no Nihongo</p>
-            <p style={styles.subtitle}>みんなの日本語 — Từ vựng Bài 1–14</p>
+            <p style={styles.subtitle}>みんなの日本語 — Từ vựng Bài 1–25</p>
           </div>
         </div>
 
         <div style={styles.section}>
           <span style={styles.label}>Chọn bài học</span>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 12 }}>
+            <button onClick={selectAllLessons} style={{ padding: "8px 14px", borderRadius: 8, border: "1px solid #ddd", background: "#f3f4f6", cursor: "pointer" }}>
+              Chọn tất cả
+            </button>
+            <button onClick={clearAllLessons} style={{ padding: "8px 14px", borderRadius: 8, border: "1px solid #ddd", background: "#f3f4f6", cursor: "pointer" }}>
+              Bỏ chọn tất cả
+            </button>
+            <span style={{ marginLeft: "auto", alignSelf: "center", fontSize: 13, color: "#666" }}>
+              {selLessons.size} / 25 bài được chọn
+            </span>
+          </div>
           <div style={styles.lessonGrid}>
-            {[1,2,3,4,5,6,7,8,9,10,11,12,13,14].map(n => (
+            {[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25].map(n => (
               <button key={n} style={styles.lessonBtn(selLessons.has(n), n)} onClick={() => toggleLesson(n)}>
                 {n}
               </button>
@@ -781,11 +808,11 @@ export default function App() {
           </button>
         </div>
 
-        <div style={{display:"flex", gap:12, marginTop:20}}>
-          <button onClick={startStudy} style={{flex:1, padding:"14px", background:"#378ADD", color:"white", border:"none", borderRadius:8, fontSize:16}}>
+        <div style={{display:"flex", gap:12, marginTop:20, flexWrap:"wrap"}}>
+          <button onClick={startStudy} disabled={!hasSelection} style={{flex:1, minWidth:140, padding:"14px", background: hasSelection ? "#378ADD" : "#9bb9ea", color:"white", border:"none", borderRadius:8, fontSize:16, cursor: hasSelection ? "pointer" : "not-allowed", opacity: hasSelection ? 1 : 0.65}}>
             Ôn Flashcard
           </button>
-          <button onClick={startQuiz} style={{flex:1, padding:"14px", background:"#D85A30", color:"white", border:"none", borderRadius:8, fontSize:16}}>
+          <button onClick={startQuiz} disabled={!hasSelection} style={{flex:1, minWidth:140, padding:"14px", background: hasSelection ? "#D85A30" : "#ebb3ab", color:"white", border:"none", borderRadius:8, fontSize:16, cursor: hasSelection ? "pointer" : "not-allowed", opacity: hasSelection ? 1 : 0.65}}>
             Làm Quiz
           </button>
         </div>
@@ -899,7 +926,7 @@ export default function App() {
           </button>
         )}
 
-        <div style={{ display:"flex", justifyContent:"flex-end", marginTop:10 }}>
+        <div style={{ display:"flex", justifyContent:"flex-end", marginTop:10, flexWrap:"wrap" }}>
           <span style={{ fontSize:13, color:"var(--color-text-secondary)" }}>
             Đúng: {score} / {quizIdx + (selected ? 1 : 0)}
           </span>
@@ -952,7 +979,7 @@ export default function App() {
           </div>
         )}
 
-        <div style={{ display:"flex", gap:10 }}>
+        <div style={{ display:"flex", gap:10, flexWrap: "wrap" }}>
           <button style={styles.startBtn("#378ADD")} onClick={startStudy}>Ôn lại flashcard</button>
           <button style={styles.startBtn("#D85A30")} onClick={startQuiz}>Quiz lại</button>
         </div>
